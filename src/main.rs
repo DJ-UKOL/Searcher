@@ -3,7 +3,7 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::time::Instant;
 
-const FILE_SIZE_BASE: f64 = 1e6;        // (1*10^6)
+const FILE_SIZE_BASE: f64 = 1e6;        // (1*10^6) константа для перевода из байт в мегабайты
 
 // Функция получения ввода от пользователя
 fn get_input(query: &str) -> std::io::Result<String> {
@@ -17,13 +17,14 @@ fn get_input(query: &str) -> std::io::Result<String> {
 }
 
 // Функция поиска файлов
-fn search_files(search_path: &str, filename: &str, extensions: &Vec<String>,    // путь, имя файла, расширение,
+fn search_files(search_path: &str, filename: &str, extensions: &Vec<String>,    // путь, имя файла, расширения,
                 now: &Instant, results_count: &mut i32) {                       // время поиска, счетчик результата
+
     let is_no_extensions = extensions.is_empty();                          // есть или нет раширения
     let is_empty_filename = filename.is_empty();                           // есть или нет имя файла
 
     let files = match std::fs::read_dir(search_path) {                      // читатем папку
-        Ok(files) => files,
+        Ok(files) => files,                                                 // получаем список файлов
         Err(_) => return
     };
 
@@ -31,8 +32,8 @@ fn search_files(search_path: &str, filename: &str, extensions: &Vec<String>,    
     for entry in files {
         if let Ok(entry) = entry {
             let path = entry.path();    // получаем путь к файлу
-            let file_name = convert_os_str(path.file_stem());
-            let file_extension = convert_os_str(path.extension());
+            let file_name = convert_os_str(path.file_stem());   // получаем имя файла
+            let file_extension = convert_os_str(path.extension());  // получаем расширение файла
 
             // если это папка
             if path.is_dir() {
@@ -66,7 +67,7 @@ fn convert_os_str(os_str: Option<&OsStr>) -> String {
 }
 
 // Функция получения данных для поиска от пользователя
-fn get_search_data() -> Option<(String, String, Vec<String>)> { // 1 - папка, 2- имя файла, 3- расширение
+fn get_search_data() -> Option<(String, String, Vec<String>)> { // Возвращает кортеж (1 - папка, 2- имя файла, 3- вектор с расширениями)
 
     // путь по которому надо искать файлы
     let search_path = match get_input("Enter path to the dir to search for file in: ") {
@@ -80,23 +81,24 @@ fn get_search_data() -> Option<(String, String, Vec<String>)> { // 1 - папк�
         Err(_) => return None
     };
 
-    // расширение которое нужно искать
+    // расширения которые нужно искать
     let search_extensions = match get_input("Enter file extensions separated by space: ") {
         Ok(extensions_string) => get_extensions(extensions_string),
         Err(_) => return None
     };
 
+    // если нет пути или нет имени файла либо расширения
     if search_path.is_empty() || (search_name.is_empty() && search_extensions.is_empty()){
         println!("Enter something!");
         return None;
-    }
+    };
 
     Some((search_path.to_lowercase(), search_name.to_lowercase(), search_extensions))
 }
 
 // Функция для разделения нескольких рашсирений из строки в вектор
 fn get_extensions(extensions_string: String) -> Vec<String> {
-    // делим слова по пробелу, переводим в нижний регистр, и собираем в коллекцию
+    // делим слова по пробелу, переводим в нижний регистр, собираем в коллекцию и возвращаем вектор
     extensions_string.split_whitespace().map(|ext| ext.to_lowercase()).collect()
 }
 
@@ -149,7 +151,7 @@ fn main() {
 
         println!(
             "\nTotal time: {} seconds\n{} matches\n",
-                now.elapsed().as_secs_f64(),
+                now.elapsed().as_secs_f64(),        // возвращает количество секунд прощедшее с текущего момента
                 results_count);
     }
 }
